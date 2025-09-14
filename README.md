@@ -108,7 +108,7 @@ business-licensing-assistant/
 
 1. **Clone and navigate to project**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Bar1996/business-licensing-assistant
    cd business-licensing-assistant
    ```
 
@@ -311,11 +311,17 @@ The system uses structured prompts for report generation:
 ```
 
 ### AI Tools Used in Development
+- **ChatGPT (GPT-5)** – Used extensively for code writing, explanations, architectural decisions, and general guidance.  
+- **Cursor AI** – Served as a smart IDE with integrated GitHub support, helping with in-editor code generation, refactoring, and rapid prototyping.  
+- **Google Gemini 1.5 Flash** – Utilized both for generating personalized Hebrew business reports and for converting the official regulatory PDF into structured JSON (`requirements.json`).  
 
-#### Primary Development Tools
-- **Cursor AI** - Primary development assistant for code generation, debugging, and architectural decisions
-- **GitHub Copilot** - Code completion and suggestions throughout development
-- **Manual prompt engineering** - Custom prompt development for Hebrew language processing
+### Reasons for Using AI
+- **Efficiency**: Significantly reduced development time, especially for boilerplate code, debugging, and script creation.  
+- **Hebrew & RTL Support**: Gemini provided high-quality Hebrew output, ensuring clear and well-structured reports in a native RTL format.  
+- **Regulatory Document Processing**: Gemini transformed complex Hebrew regulatory PDFs into structured JSON data, eliminating tedious manual work.  
+- **Productivity Boost**: ChatGPT and Cursor combined provided both reasoning/explanations and direct code generation, speeding up iteration cycles.  
+- **Code Quality**: AI tools enforced consistent structure, improved readability, and supported robust error handling and fallback mechanisms.  
+
 
 #### AI Integration Details
 - **Google Gemini 1.5 Flash** - Primary language model for Hebrew text processing
