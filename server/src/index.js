@@ -10,7 +10,7 @@ app.use(express.json());
 
 // Routes
 app.use('/requirements', requirementsRoutes);
-// app.use('/report', reportRoutes);
+app.use('/report', reportRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

@@ -1,9 +1,14 @@
 function matchAnswers(answers, requirements) {
     return requirements.filter(rule => {
-      // Very naive matching example
-      if (rule.appliesWhen.seats && answers.seats < rule.appliesWhen.seats.gte) return false;
-      if (rule.appliesWhen.areaM2 && answers.areaM2 < rule.appliesWhen.areaM2.gte) return false;
-      if (rule.appliesWhen.servesAlcohol && !answers.servesAlcohol) return false;
+      const { appliesWhen } = rule;
+  
+      if (!appliesWhen) return true;
+  
+      if (appliesWhen.seats && answers.seats < appliesWhen.seats.gte) return false;
+      if (appliesWhen.areaM2 && answers.areaM2 < appliesWhen.areaM2.gte) return false;
+      if (appliesWhen.servesAlcohol && !answers.servesAlcohol) return false;
+      if (appliesWhen.usesGas && !answers.usesGas) return false;
+  
       return true;
     });
   }

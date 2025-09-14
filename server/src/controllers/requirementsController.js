@@ -7,8 +7,14 @@ function getRequirements(req, res) {
 
 function matchRequirements(req, res) {
   const answers = req.body;
-  const matched = matchAnswers(answers, requirements);
-  res.json({ matched, answers });
+
+  try {
+    const matched = matchAnswers(answers, requirements);
+    res.json({ matched, answers });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to match requirements' });
+  }
 }
 
 module.exports = { getRequirements, matchRequirements };
