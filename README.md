@@ -363,6 +363,11 @@ The system uses carefully crafted prompts for Hebrew language processing:
 - **Report Export** - PDF and Markdown download
 - **Modern UI** - Gradient backgrounds and smooth animations
 
+> **Note**: For simplicity, all frontend logic is implemented in a single `App.jsx` file.  
+> In a production system, this would be split into separate components (e.g., `Form`, `Report`, `Navbar`)  
+> to improve maintainability and scalability.
+
+
 ### Backend Features
 - **Intelligent Matching** - Rule-based requirement filtering
 - **AI Integration** - Seamless LLM integration with fallback
