@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon ./src/index.js",
-    "start": "node ./src/index.js"
+    "start": "node ./src/index.js",
+    "parse:pdf": "node scripts/pdfToJson.js src/data/raw/18-07-2022_4.2A.pdf src/data/processed/requirements.json"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +17,9 @@
     "@google/generative-ai": "^0.24.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "pdf-parse": "^1.1.1",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

@@ -110,8 +110,28 @@ export default function App() {
   }
 
   return (
-    <div
-      dir="rtl"
+    <>
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(99, 102, 241, 0.6);
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(99, 102, 241, 0.8);
+        }
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(99, 102, 241, 0.6) transparent;
+        }
+      `}</style>
+      <div
+        dir="rtl"
       className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-zinc-900 text-zinc-100"
     >
       {/* NAVBAR */}
@@ -262,52 +282,55 @@ export default function App() {
             התאמות שנמצאו
           </h2>
 
-          <div className="overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-500 scrollbar-track-transparent">
-
-            {matched.length === 0 ? (
-              <p className="text-sm text-zinc-400">
-                אין התאמות עדיין. מלא את הטופס ולחץ <b>התאם דרישות</b>.
-              </p>
-            ) : (
-              <ul className="space-y-4">
-                {matched.map((req) => (
-                  <li
-                    key={req.id}
-                    className="rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition"
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="font-medium text-indigo-300">
-                        {req.title}
+          <div className="flex-1 min-h-0">
+            <div className="h-full max-h-[40rem] overflow-y-auto pr-2 custom-scrollbar">
+              {matched.length === 0 ? (
+                <div className="flex items-center justify-center h-32">
+                  <p className="text-sm text-zinc-400 text-center">
+                    אין התאמות עדיין. מלא את הטופס ולחץ <b>התאם דרישות</b>.
+                  </p>
+                </div>
+              ) : (
+                <ul className="space-y-4 pb-2">
+                  {matched.map((req) => (
+                    <li
+                      key={req.id}
+                      className="rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition-all duration-200 hover:border-white/20"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="font-medium text-indigo-300">
+                          {req.title}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center rounded-full bg-indigo-500/15 text-indigo-300 px-3 py-1 text-xs border border-indigo-500/30">
+                            {req.authority}
+                          </span>
+                          <span
+                            className={`inline-flex items-center rounded-full px-3 py-1 text-xs border ${
+                              req.priority === "high"
+                                ? "bg-rose-500/15 text-rose-300 border-rose-500/30"
+                                : req.priority === "medium"
+                                ? "bg-amber-500/15 text-amber-300 border-amber-500/30"
+                                : "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
+                            }`}
+                          >
+                            עדיפות: {req.priority}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center rounded-full bg-indigo-500/15 text-indigo-300 px-3 py-1 text-xs border border-indigo-500/30">
-                          {req.authority}
-                        </span>
-                        <span
-                          className={`inline-flex items-center rounded-full px-3 py-1 text-xs border ${
-                            req.priority === "high"
-                              ? "bg-rose-500/15 text-rose-300 border-rose-500/30"
-                              : req.priority === "medium"
-                              ? "bg-amber-500/15 text-amber-300 border-amber-500/30"
-                              : "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
-                          }`}
-                        >
-                          עדיפות: {req.priority}
-                        </span>
-                      </div>
-                    </div>
 
-                    {req.steps?.length > 0 && (
-                      <ul className="mt-3 list-disc list-inside space-y-1 text-sm text-zinc-300">
-                        {req.steps.map((s, i) => (
-                          <li key={i}>{s}</li>
-                        ))}
-                      </ul>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
+                      {req.steps?.length > 0 && (
+                        <ul className="mt-3 list-disc list-inside space-y-1 text-sm text-zinc-300">
+                          {req.steps.map((s, i) => (
+                            <li key={i}>{s}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
         </section>
 
@@ -408,5 +431,6 @@ export default function App() {
         אבטיפוס • אינו ייעוץ משפטי. יש לאמת מול הרשויות.
       </footer>
     </div>
+    </>
   );
 }
