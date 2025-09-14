@@ -1,17 +1,25 @@
-function matchAnswers(answers, requirements) {
-    return requirements.filter(rule => {
-      const { appliesWhen } = rule;
-  
-      if (!appliesWhen) return true;
-  
-      if (appliesWhen.seats && answers.seats < appliesWhen.seats.gte) return false;
-      if (appliesWhen.areaM2 && answers.areaM2 < appliesWhen.areaM2.gte) return false;
-      if (appliesWhen.servesAlcohol && !answers.servesAlcohol) return false;
-      if (appliesWhen.usesGas && !answers.usesGas) return false;
-  
+const priorityOrder = { high: 0, medium: 1, low: 2 };
+
+function passNum(val, cond = {}) {
+  if (cond.gte != null && !(val >= cond.gte)) return false;
+  if (cond.lte != null && !(val <= cond.lte)) return false;
+  if (cond.eq  != null && !(val === cond.eq)) return false;
+  return true;
+}
+
+function matchAnswers(answers = {}, requirements = []) {
+  return requirements
+    .filter(rule => {
+      const aw = rule.appliesWhen || {};
+      if (aw.areaM2 && !passNum(answers.areaM2 ?? 0, aw.areaM2)) return false;
+      if (aw.seats  && !passNum(answers.seats  ?? 0, aw.seats))  return false;
+
+      for (const k of ['servesAlcohol','usesGas','deliveries','servesMeat']) {
+        if (typeof aw[k] === 'boolean' && answers[k] !== aw[k]) return false;
+      }
       return true;
-    });
-  }
-  
-  module.exports = { matchAnswers };
-  
+    })
+    .sort((a,b) => (priorityOrder[a.priority] ?? 9) - (priorityOrder[b.priority] ?? 9));
+}
+
+module.exports = { matchAnswers };
