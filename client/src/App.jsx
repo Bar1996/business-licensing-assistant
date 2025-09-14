@@ -18,13 +18,13 @@ async function api(path, body) {
 
 export default function App() {
   const [answers, setAnswers] = useState({
-    businessName: "",   // 🆕 שם העסק
+    businessName: "",
     seats: 0,
     areaM2: 0,
     servesAlcohol: false,
     usesGas: false,
-    deliveries: false,  // 🆕 מבצע משלוחים
-    servesMeat: false,  // 🆕 מגיש בשר
+    deliveries: false,
+    servesMeat: false,
   });
 
   const [matched, setMatched] = useState([]);
@@ -33,6 +33,12 @@ export default function App() {
   const [loadingReport, setLoadingReport] = useState(false);
   const [error, setError] = useState("");
   const reportRef = useRef(null);
+
+  // ניראות הדוח: המרה של <br> לירידת שורה Markdown
+  const mdReport = useMemo(
+    () => (report ? report.replace(/<br\s*\/?>/gi, "  \n") : ""),
+    [report]
+  );
 
   const isReady = useMemo(
     () => Number(answers.areaM2) > 0 && Number(answers.seats) >= 0,
@@ -44,7 +50,11 @@ export default function App() {
     setAnswers((prev) => ({
       ...prev,
       [name]:
-        type === "checkbox" ? checked : name === "businessName" ? value : Number(value),
+        type === "checkbox"
+          ? checked
+          : name === "businessName"
+          ? value
+          : Number(value),
     }));
   }
 
@@ -82,7 +92,9 @@ export default function App() {
 
   function downloadPdf() {
     if (!reportRef.current) return;
-    const filename = `business-licensing-report-${(answers.businessName || "report")
+    const filename = `business-licensing-report-${(
+      answers.businessName || "report"
+    )
       .replace(/\s+/g, "-")
       .toLowerCase()}.pdf`;
     html2pdf()
@@ -97,30 +109,27 @@ export default function App() {
       .save();
   }
 
-  function downloadMd() {
-    if (!report) return;
-    const blob = new Blob([report], { type: "text/markdown;charset=utf-8" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `report-${(answers.businessName || "business").replace(/\s+/g, "-")}.md`;
-    a.click();
-  }
-
   return (
-    <div dir="rtl" className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-zinc-900 text-zinc-100">
-      <header className="border-b border-white/10 backdrop-blur sticky top-0 z-10 bg-black/30">
-        <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
+    <div
+      dir="rtl"
+      className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-zinc-900 text-zinc-100"
+    >
+      {/* NAVBAR */}
+      <header className="sticky top-0 z-20 border-b border-white/10 bg-black/30 backdrop-blur">
+        <div className="w-full pr-2 pl-4 sm:pr-4 sm:pl-6 lg:pr-8 lg:pl-8 py-4 flex items-center justify-start">
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 via-sky-400 to-fuchsia-400 bg-clip-text text-transparent">
             עוזר רישוי עסקים
           </h1>
-          <div className="text-xs text-zinc-400">מבוסס React + Tailwind + Node</div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 py-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* טופס */}
-        <section className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl p-6 md:p-8 animate-fade-in">
-          <h2 className="text-lg font-semibold mb-6 text-zinc-200">פרטי העסק</h2>
+      {/* LAYOUT */}
+      <main className="mx-auto max-w-screen-2xl pr-2 pl-4 sm:pr-4 sm:pl-6 lg:pr-8 lg:pl-8 py-8 lg:py-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+        {/* FORM */}
+        <section className="lg:col-span-5 min-w-0 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl p-6 md:p-8 animate-fade-in">
+          <h2 className="text-lg font-semibold mb-6 text-zinc-200">
+            פרטי העסק
+          </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <label className="flex flex-col gap-2 sm:col-span-2">
@@ -130,7 +139,7 @@ export default function App() {
                 name="businessName"
                 value={answers.businessName}
                 onChange={onChange}
-                placeholder="לדוגמה: מסעדת הדוגמה"
+                placeholder="לדוגמה: מסעדת הרצל"
                 className="w-full rounded-xl bg-white text-zinc-900 px-3 py-2 shadow-inner outline-none ring-2 ring-transparent focus:ring-indigo-400 transition"
               />
             </label>
@@ -206,23 +215,37 @@ export default function App() {
             </label>
           </div>
 
-          <div className="mt-7 flex flex-wrap gap-3">
+          <div className="mt-7 flex flex-col sm:flex-row gap-3">
             <button
               type="button"
               onClick={handleMatch}
               disabled={!isReady || loadingMatch}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 disabled:opacity-40 px-5 py-2.5 font-medium shadow-lg shadow-indigo-900/30 transition-transform hover:-translate-y-0.5"
+              className="w-full sm:w-1/2 inline-flex items-center justify-center gap-2 rounded-xl 
+               bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 
+               disabled:opacity-40 px-5 py-2.5 font-medium shadow-lg shadow-indigo-900/30 
+               transition-transform hover:-translate-y-0.5"
             >
-              {loadingMatch ? <span className="loader size-4" /> : <span>התאם דרישות</span>}
+              {loadingMatch ? (
+                <span className="loader size-4" />
+              ) : (
+                <span>התאם דרישות</span>
+              )}
             </button>
 
             <button
               type="button"
               onClick={handleReport}
               disabled={!isReady || loadingReport}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-lime-600 hover:from-emerald-500 hover:to-lime-500 disabled:opacity-40 px-5 py-2.5 font-medium shadow-lg shadow-emerald-900/30 transition-transform hover:-translate-y-0.5"
+              className="w-full sm:w-1/2 inline-flex items-center justify-center gap-2 rounded-xl 
+               bg-gradient-to-r from-emerald-600 to-lime-600 hover:from-emerald-500 hover:to-lime-500 
+               disabled:opacity-40 px-5 py-2.5 font-medium shadow-lg shadow-emerald-900/30 
+               transition-transform hover:-translate-y-0.5"
             >
-              {loadingReport ? <span className="loader size-4" /> : <span>צור דוח</span>}
+              {loadingReport ? (
+                <span className="loader size-4" />
+              ) : (
+                <span>צור דוח</span>
+              )}
             </button>
           </div>
 
@@ -233,58 +256,65 @@ export default function App() {
           )}
         </section>
 
-        {/* התאמות שנמצאו */}
-        <section className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl p-6 md:p-8 animate-fade-in">
-          <h2 className="text-lg font-semibold mb-4 text-zinc-200">התאמות שנמצאו</h2>
+        {/* MATCHED */}
+        <section className="lg:col-span-7 min-w-0 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl p-6 md:p-8 animate-fade-in flex flex-col">
+          <h2 className="text-lg font-semibold mb-4 text-zinc-200">
+            התאמות שנמצאו
+          </h2>
 
-          {matched.length === 0 ? (
-            <p className="text-sm text-zinc-400">
-              אין התאמות עדיין. מלא את הטופס ולחץ <b>התאם דרישות</b>.
-            </p>
-          ) : (
-            <ul className="space-y-4">
-              {matched.map((req) => (
-                <li
-                  key={req.id}
-                  className="rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="font-medium text-indigo-300">{req.title}</div>
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center rounded-full bg-indigo-500/15 text-indigo-300 px-3 py-1 text-xs border border-indigo-500/30">
-                        {req.authority}
-                      </span>
-                      <span
-                        className={`inline-flex items-center rounded-full px-3 py-1 text-xs border ${
-                          req.priority === "high"
-                            ? "bg-rose-500/15 text-rose-300 border-rose-500/30"
-                            : req.priority === "medium"
-                            ? "bg-amber-500/15 text-amber-300 border-amber-500/30"
-                            : "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
-                        }`}
-                      >
-                        עדיפות: {req.priority}
-                      </span>
+          <div className="overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-500 scrollbar-track-transparent">
+
+            {matched.length === 0 ? (
+              <p className="text-sm text-zinc-400">
+                אין התאמות עדיין. מלא את הטופס ולחץ <b>התאם דרישות</b>.
+              </p>
+            ) : (
+              <ul className="space-y-4">
+                {matched.map((req) => (
+                  <li
+                    key={req.id}
+                    className="rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="font-medium text-indigo-300">
+                        {req.title}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center rounded-full bg-indigo-500/15 text-indigo-300 px-3 py-1 text-xs border border-indigo-500/30">
+                          {req.authority}
+                        </span>
+                        <span
+                          className={`inline-flex items-center rounded-full px-3 py-1 text-xs border ${
+                            req.priority === "high"
+                              ? "bg-rose-500/15 text-rose-300 border-rose-500/30"
+                              : req.priority === "medium"
+                              ? "bg-amber-500/15 text-amber-300 border-amber-500/30"
+                              : "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
+                          }`}
+                        >
+                          עדיפות: {req.priority}
+                        </span>
+                      </div>
                     </div>
-                  </div>
 
-                  {req.steps?.length > 0 && (
-                    <ul className="mt-3 list-disc list-inside space-y-1 text-sm text-zinc-300">
-                      {req.steps.map((s, i) => (
-                        <li key={i}>{s}</li>
-                      ))}
-                    </ul>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
+                    {req.steps?.length > 0 && (
+                      <ul className="mt-3 list-disc list-inside space-y-1 text-sm text-zinc-300">
+                        {req.steps.map((s, i) => (
+                          <li key={i}>{s}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </section>
 
-        {/* דוח */}
+        {/* REPORT */}
         <section
           id="report"
-          className="lg:col-span-2 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl p-6 md:p-8 animate-fade-in"
+          className="scroll-mt-24 lg:col-span-12 min-w-0 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl p-6 md:p-8 animate-fade-in"
         >
           <div className="flex items-center justify-between gap-3 mb-4">
             <h2 className="text-lg font-semibold text-zinc-200">דוח</h2>
@@ -308,7 +338,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* תגים מסכמים לפי התאמות שנמצאו */}
+          {/* תגים מסכמים */}
           {matched.length > 0 && (
             <div className="mb-4 flex flex-wrap gap-2">
               {matched.map((r) => (
@@ -330,9 +360,42 @@ export default function App() {
           )}
 
           {report ? (
-            <div ref={reportRef} className="prose prose-invert max-w-none rtl">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{report}</ReactMarkdown>
-          </div>
+            <div
+              ref={reportRef}
+              className="prose prose-invert max-w-none rtl text-right"
+            >
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  p: ({ node, ...props }) => (
+                    <p className="mb-3 leading-relaxed" {...props} />
+                  ),
+                  li: ({ node, ...props }) => (
+                    <li className="mb-1" {...props} />
+                  ),
+                  h1: ({ node, ...props }) => (
+                    <h1
+                      className="text-xl font-bold mt-6 mb-3 text-indigo-300"
+                      {...props}
+                    />
+                  ),
+                  h2: ({ node, ...props }) => (
+                    <h2
+                      className="text-lg font-semibold mt-5 mb-2 text-sky-300"
+                      {...props}
+                    />
+                  ),
+                  h3: ({ node, ...props }) => (
+                    <h3
+                      className="text-base font-semibold mt-4 mb-2 text-sky-200"
+                      {...props}
+                    />
+                  ),
+                }}
+              >
+                {mdReport}
+              </ReactMarkdown>
+            </div>
           ) : (
             <p className="text-sm text-zinc-400">
               אין דוח עדיין. לחץ <b>צור דוח</b> כדי ליצור אחד.
@@ -341,7 +404,7 @@ export default function App() {
         </section>
       </main>
 
-      <footer className="mx-auto max-w-6xl px-6 pb-10 text-xs text-zinc-500">
+      <footer className="mx-auto max-w-screen-2xl pr-2 pl-4 sm:pr-4 sm:pl-6 lg:pr-8 lg:pl-8 pb-10 text-xs text-zinc-500">
         אבטיפוס • אינו ייעוץ משפטי. יש לאמת מול הרשויות.
       </footer>
     </div>
