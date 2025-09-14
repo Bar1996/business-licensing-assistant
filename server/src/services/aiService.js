@@ -1,18 +1,33 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
+function titleWithName(name) {
+  const n = (name || "").trim();
+  return n ? `דוח רישוי לעסק מזון – ${n}` : `דוח רישוי לעסק מזון`;
+}
+
 function systemPrompt() {
   return `מטרתך: להכין דוח רישוי מותאם לעסק מזון בישראל בעברית, בפורמט Markdown.
-כלול: תקציר, דרישות לפי עדיפות ורשות, צעדים מעשיים (bullets), אסמכתאות אם קיימות, ולבסוף הסתייגות.
-הסגנון תמציתי ונגיש לבעלי עסקים.`;
+- בכותרת הראשונה השתמש בשם העסק אם סופק (answers.businessName).
+- כלול: תקציר, דרישות לפי עדיפות ורשות, צעדים מעשיים (bullets), אסמכתאות אם קיימות, ולבסוף הסתייגות.
+- הסגנון תמציתי ונגיש לבעלי עסקים.`;
 }
 
 function userPrompt({ answers, matched }) {
-  return `מאפייני עסק:\n${JSON.stringify(answers, null, 2)}\n\nדרישות מותאמות:\n${JSON.stringify(matched, null, 2)}\n\nבנה דוח Markdown בהתאם להנחיות.`;
+  return `כותרת מומלצת: "${titleWithName(answers.businessName)}"
+
+מאפייני עסק:
+${JSON.stringify(answers, null, 2)}
+
+דרישות מותאמות:
+${JSON.stringify(matched, null, 2)}
+
+בנה דוח Markdown בהתאם להנחיות.`;
 }
 
 function buildPlainReport({ answers, matched }) {
-  let md = `# דוח רישוי מותאם\n\n`;
-  md += `**תקציר:** הדוח נבנה לפי מאפייני העסק: שטח ${answers.areaM2 || 0} מ"ר, ${answers.seats || 0} מקומות ישיבה, ${answers.servesAlcohol ? 'מגיש אלכוהול' : 'ללא אלכוהול'}.\n\n`;
+  const title = titleWithName(answers.businessName);
+  let md = `# ${title}\n\n`;
+  md += `**תקציר:** הדוח נבנה לפי מאפייני העסק: שטח ${answers.areaM2 || 0} מ"ר, ${answers.seats || 0} מקומות ישיבה, ${answers.servesAlcohol ? "מגיש אלכוהול" : "ללא אלכוהול"}${answers.usesGas ? ", שימוש בגז" : ""}${answers.deliveries ? ", מבצע משלוחים" : ""}${answers.servesMeat ? ", מגיש בשר" : ""}.\n\n`;
   md += `## דרישות מותאמות\n`;
   for (const r of matched) {
     md += `### ${r.title}  \n`;
@@ -28,7 +43,6 @@ function buildPlainReport({ answers, matched }) {
 }
 
 async function geminiReport(ctx) {
-
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("GEMINI_API_KEY missing");
 
@@ -51,4 +65,4 @@ async function generateLLMReport(ctx) {
   }
 }
 
-module.exports = { generateLLMReport };
+module.exports = { generateLLMReport, buildPlainReport };
